@@ -117,6 +117,6 @@ void ___ROM_USE_PLL_CLOCK(void)
 void ___ROM_CLOCK_INIT(void) 
 {
 	___ROM_USE_PLL_CLOCK();
-	___ROM_CLOCK_MEASURE_FROM_PC9_MCO2();
+	//___ROM_CLOCK_MEASURE_FROM_PC9_MCO2();
 	//test_var *= 2.0;
 }
