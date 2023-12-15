@@ -2,9 +2,10 @@
 
 int main(void) 
 {
+	
 	___ROM_VARIABLES_INIT();
 	___ROM_CLOCK_INIT();
-	___ROM_GPIO_INIT();
+	//___ROM_GPIO_INIT();
 	
 	
 	while(1)
