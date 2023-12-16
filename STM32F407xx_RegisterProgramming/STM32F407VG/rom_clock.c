@@ -10,7 +10,7 @@ void ___ROM_CLOCK_MEASURE_FROM_PA8_MCO1(void)
 	// LSE ဆိုရင် 1<<21 , 
 	// HSE ဆိုရင် 2<<21 , 
 	// PLL ဆိုရင် 3<<21 ဖြစ်ပြီး PLL ရွေး ထားသည်။
-	RCC->CFGR |= 3<<21;
+	//--> RCC->CFGR |= 3<<21;
 
 	// သူသည် prescaler ဖြစ်ပြီး 
 	// 0 ဆို no division, 
@@ -19,7 +19,7 @@ void ___ROM_CLOCK_MEASURE_FROM_PA8_MCO1(void)
 	// 110 ဆို divide by 4, 
 	// 111 ဆို divide by 5 ဖြစ်ပြီး divide by 4 ရွေးထားသည်။ 168/4 = 42MHz 
 	// MCO1 PRE
-	RCC->CFGR |= 6<<24;
+	//--> RCC->CFGR |= 6<<24;
 }
 
 
@@ -41,8 +41,9 @@ void ___ROM_CLOCK_MEASURE_FROM_PC9_MCO2(void)
 	// 101 ဆို divide by 3, 
 	// 110 ဆို divide by 4, ( 42MHz )
 	// 111 ဆို divide by 5  ( 33.6MHz) 
-	// ယခု 111 ရွေးထားသည်။ 168/5 = 33.6 MHz 
-	RCC->CFGR |= 7<<27;
+	// ယခု 110 ရွေးထားသည်။ 168/4 = 42 MHz 
+	RCC->CFGR &= ~(7u<<27);
+	RCC->CFGR |= 6u<<27;
 }
 
 
@@ -79,21 +80,22 @@ void ___ROM_USE_PLL_CLOCK(void)
 	
 	/* PLL 168MHz */
 	// reference manual အရ VCO သည် 1 to 2MHz အတွင်း ရှိရမှာမို့  PLLM ကို divide by 8 ထားပြီး  1MHz ရအောင်လုပ်မည်။
-	RCC->PLLCFGR &= ~( 0x1FU );
-	RCC->PLLCFGR |= ( 0x08 );           // PLLM = 8
+	RCC->PLLCFGR &= ~( 0x3FU );
+	RCC->PLLCFGR |= ( 1<<2 );           // PLLM = 4
 	// VCO input သည် 1MHz ရှိပြီး reference manual အရ PLLN သည် 192 to 432 ရှိရမှာဖြစ်သည်။
 	// PLLN ကို 336 ထားပြီး formula အရ  VCO output 336MHz ရသည်။
-	RCC->PLLCFGR &= ~( 0x1FFU << 6 );
-	RCC->PLLCFGR |= ( 336 << 6 );     // PLLN = 336
+	RCC->PLLCFGR &= ~( 0x7FC0U);
+	RCC->PLLCFGR |= ( 168 << 6 );     // PLLN = 168
 	// နောက်တဆင့်အနေနဲ့  PLLP ကို divide by 2 ထားပြီး 168MHz ရပါသည်။
-	RCC->PLLCFGR &= ~( 0x03U << 16 );
-	RCC->PLLCFGR |= ( 0x02 << 16 );
+	RCC->PLLCFGR &= ~( 0x03U << 16 ); // PLLP = 2 is 00
+	
+	// PLLQ
+	RCC->PLLCFGR &= ~(15u<<28);
 	
 	// PLLON bit ( clock ကို stable ဖြစ်စေရန် clock cycle အနည်းငယ်စောင့်ပြီး ready bit ကို စောင့်သည်။ )
 	RCC->CR |= ( 1 << 24);
 
-	// PLLRDY bit
-	while( ! ( RCC->CR & (1<<25) ) );
+	
 
 	// SW0, SW1 bit များ ကို ကိုင်ပြီး system clock ကို PLL အသုံးပြုခိုင်းသည်။
 	RCC->CFGR &= ~(0x3U);  // bit 0 နဲ့ bit 1 ကို 0 ဖြစ်စေ သည်။
@@ -103,14 +105,24 @@ void ___ROM_USE_PLL_CLOCK(void)
 	RCC->CFGR &= ~( 0xFU << 4 );
 
 	/* APB1 prescaler 4 , (168/4) = 42MHz */
-	RCC->CFGR &= ~( 0x7U << 10 );
-	RCC->CFGR |= ( 0x5U << 10 );
+	RCC->CFGR &= ~( 7U << 10 );
+	RCC->CFGR |= ( 5U << 10 );
 
 	/* APB2 prescaler 2 , (168/2) = 84MHz */
-	RCC->CFGR &= ~( 0x7U << 13 );
-	RCC->CFGR |= ( 0x4 << 13 );
+	RCC->CFGR &= ~( 7U << 13 );
+	RCC->CFGR |= ( 4U << 13 );
 	
+	// MCO2
+	___ROM_CLOCK_MEASURE_FROM_PC9_MCO2();
+	
+	/* Power Interface Clock Enable */
+	RCC->APB1ENR |= 1<<28;
+	
+	/* System configuration controller Clock Enable */
+	RCC->APB2ENR |= 1<<14;
 	// ခုကစပြီး MCU သည်  SYSCLK အဖြစ် PLL ကို အသုံးပြုပြီး full speed 168MHz ဖြစ်သည်။
+	// PLLRDY bit
+	while( ! ( RCC->CR & (1<<25) ) );
 }
 
 
