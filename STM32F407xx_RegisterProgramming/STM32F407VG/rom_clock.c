@@ -100,7 +100,7 @@ void ___ROM_USE_PLL_CLOCK(void)
 	RCC->APB2ENR |= 1<<14;
 	
 	// VOS regulator
-	PWR->CSR |= 1<<14;
+	//PWR->CSR |= 1<<14;
 	
 	// FLASH data cache , instruction cache , prefetch enable
 	FLASH->ACR |= 1<<8 | 1<<9 | 1<<10; 
