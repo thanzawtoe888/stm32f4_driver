@@ -10,6 +10,7 @@
 /* Declaration of variables */ /* variables.h -> main.h -> main.c -> something.c */
 extern double test_var;
 extern double gpio_var;
+extern uint16_t push_btn;
 
 #define BITBAND(addr, bitnum) ((addr & 0xF0000000)+0x2000000+((addr &0xFFFFF)<<5)+(bitnum<<2)) 
 #define MEM_ADDR(addr)  *((volatile unsigned long  *)(addr)) 
@@ -41,5 +42,7 @@ extern double gpio_var;
 
 #define PEout(n)   BIT_ADDR(ROM_GPIOE_ODR_Address,n)  
 #define PEin(n)    BIT_ADDR(ROM_GPIOE_IDR_Address,n) 
+
+#define push_btn_bit	PAin(0)
 
 #endif

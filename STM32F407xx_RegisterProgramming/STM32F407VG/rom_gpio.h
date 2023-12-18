@@ -12,9 +12,16 @@
 #define red_led 		PDout(14)
 #define blue_led 		PDout(15)
 
-#define user_btn		PAin(0);
-
 void ___ROM_GPIO_INIT(void);
+
+void __gpio_led_init(void);
+	
+// 0 --> falling edge, 1 --> rising edge, 2 --> both
+void __gpio_configure_interrupt(uint16_t pin_no, uint8_t edge);
+void __gpio_clear_interrupt(uint16_t pin_no);
+
+// Emergency Stop
+void __gpio_emergency_stop(void);
 
 #endif
 

@@ -8,7 +8,7 @@
 #include "variables.h"
 
 /* pc9 တွင် clock output လိုချင်ပါက အောက်ပါ MACRO ကို  comment ဖြုတ်ပါ။ */
-//#define USE_PC9_AS_CLOCK_OUTPUT 1
+#define USE_PC9_AS_CLOCK_OUTPUT 1
 
 void ___ROM_CLOCK_INIT(void);
 void ___ROM_CLOCK_MEASURE_FROM_PC9_MCO2(void);
