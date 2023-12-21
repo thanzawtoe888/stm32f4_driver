@@ -1,24 +1,25 @@
 #include "rom_timer.h"
 
-// todo 1 pandabot Hz?
+// todo (1) check pandabot Hz?
+// todo (2) check ANB1ENR TIMER9 Bit and other bits
 
 void __ROS2_HZ(uint16_t ros2_frequency)
 {
-	RCC->AHB1ENR = RCC_APB2ENR_TIM9EN; // recheck =  or |=?
+	RCC->AHB2ENR = RCC_APB2ENR_TIM9EN; // recheck =  or |=?
 	/* FORMULA
-	// Assume => MCU က 72MHz ရှိတယ် ကျတော် တို့က တခါတက်တိုင်း 1 micro second တက်ချင်တယ်။
+	// Assume => MCU က 72MHz ရှိတယ် ကျတော် တို့က တခါတက်တိုင်း 1 us တက်ချင်တယ်။
 	period = 1/72e6 = 72e-6 seconds = 0.13888 * e-6 = 13.8 ns
 	PSC = 1us / 13.9 ns = 1/13.9 e3 = 71.9
 	So RCC->PSC  = 71;
 	
-	// Assume => 168MHz, we want 1us step
+	// Assume => Clock 168MHz and we want 1us step
 	1us / [(1e-6/168)) = ( e-6 * 168 ) / e-6 = 168
 	So RCC->PSC = 168;  // 168 or 168-1
 	*/
-	TIM9->PSC  = 16;
+	TIM9->PSC  = 168-1; // 1MHz clock = 1 us step
+	
 	// FOR 10000us => 10000 us/1us = 10000
 	//TIM9->ARR  = 10000;	// 10us	
-	
 	
 	// 1/100Hz = 10000 us = 10ms
 	// 1/90Hz  = 11111 us = 11ms
@@ -33,21 +34,20 @@ void __ROS2_HZ(uint16_t ros2_frequency)
 	
 	switch(ros2_frequency)
 	{
-		case 100: TIM9->ARR  = 10000; break;
-		case 90: TIM9->ARR  = 11111; break;
-		case 80: TIM9->ARR  = 12500; break;
-		case 70: TIM9->ARR  = 14285; break;
-		case 60: TIM9->ARR  = 16666; break;
-		case 50: TIM9->ARR  = 20000; break;
-		case 40: TIM9->ARR  = 25000; break;
-		case 30: TIM9->ARR  = 33333; break;
-		case 20: TIM9->ARR  = 50000; break;
+		case 100: TIM9->ARR = 10000-1; break;
+		case 90: TIM9->ARR  = 11111-1; break;
+		case 80: TIM9->ARR  = 12500-1; break;
+		case 70: TIM9->ARR  = 14285-1; break;
+		case 60: TIM9->ARR  = 16666-1; break;
+		case 50: TIM9->ARR  = 20000-1; break;
+		case 40: TIM9->ARR  = 25000-1; break;
+		case 30: TIM9->ARR  = 33333-1; break;
+		case 20: TIM9->ARR  = 50000-1; break;
 		
 		default: TIM9->ARR  = 20000; break;
 	}
 	
-	// clear counter
-	TIM9->CNT  = 0;
+	TIM9->CNT  = 0;		// clear counter
 	TIM9->CR1 |= 1; 	// counter enable
 	TIM9->DIER|= 1; 	// interrupt enable
 	NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);

@@ -7,8 +7,7 @@
 
 #include "variables.h"
 
-// timer 9
-// available ros2_frequency ( 10..100 )
+// TIM9 --> available ros2_frequency ( 20,30,40,50,60,70,80,90,100 ) Hz
 void __ROS2_HZ(uint16_t ros2_frequency);
 
 #endif

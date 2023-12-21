@@ -14,12 +14,8 @@ int main(void)
 	}
 }
 
-void TIM1_BRK_TIM9_IRQHandler(void)
-{
-	if( TIM9->SR & TIM_SR_UIF ) {
-		TIM9->SR &= ~TIM_SR_UIF;
-	}
-}
+// interrupt use about 3us
+
 
 void ___ROM_VARIABLES_INIT(void)
 {
